@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="PRG_Measurement" Id="{db07a1fa-67fe-47bc-baee-fdee98435978}" SpecialFunc="None">
+    <Declaration><![CDATA[/// <summary>
+/// 計測プログラム
+/// </summary>
+PROGRAM PRG_Measurement
+VAR
+	/// サンプルデータ #1
+	sampleData1 : ARRAY[1..10] OF LREAL;
+	/// サンプルデータ #2
+	sampleData2 : ARRAY[1..10] OF LREAL;
+	/// サンプルデータ #3
+	sampleData3 : ARRAY[1..10] OF LREAL;	
+
+	/// Sin波信号生成器 #1
+	fbSineWaveGen1 : FB_SineWaveGenerator;
+	/// Sin波信号生成器 #2
+	fbSineWaveGen2 : FB_SineWaveGenerator;
+	/// Sin波信号生成器 #3
+	fbSineWaveGen3 : FB_SineWaveGenerator;
+	
+	idx : UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// サンプルデータを計測する
+fbSineWaveGen1.Generate(fFrequency := 0.5, fAmplitude := 5.0, refData := sampleData1);
+fbSineWaveGen2.Generate(fFrequency := 10.0, fAmplitude := 3.0, refData := sampleData2);
+fbSineWaveGen3.Generate(fFrequency := 100.0, fAmplitude := 2.0, refData := sampleData3);
+
+
+// 信号を合成する
+FOR idx := 1 TO 10 DO
+	GVL.MeasuredData[idx] := sampleData1[idx] + sampleData2[idx] + sampleData3[idx];
+END_FOR]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

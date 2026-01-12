@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL" Id="{cb1bf10f-c647-4024-83a0-f157b155c910}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+ 	/// 計測データ
+	MeasuredData : ARRAY[1..10] OF LREAL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

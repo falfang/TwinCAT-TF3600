@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_SineWaveGenerator" Id="{92718750-19ca-490d-a094-6951900bea3b}" SpecialFunc="None">
+    <Declaration><![CDATA[/// <summary>
+/// Sin波信号生成器
+/// </summary>
+FUNCTION_BLOCK FB_SineWaveGenerator
+VAR
+	/// 位相
+	fPhase : LREAL;
+	/// サイクルタイム [s]
+	fCycleTime : LREAL;
+	/// 初期化完了フラグ
+	bInitialized : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FB_Init" Id="{e48674b0-15c3-4cde-a866-d0e53a1c8c76}">
+      <Declaration><![CDATA[//FB_Init は常に暗黙的に使用可能で、主に初期化に使用されます。
+//戻り値は評価されません。特定の結果を得るために、メソッドを明示的に宣言し、
+//そのメソッドに標準の初期化コードをもったコードを追加することができます。戻り値を評価できます。
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: 保持変数は初期化されます (ウォーム リセット、あるいはコールド リセット)
+    bInCopyCode: BOOL;  // TRUE: 後でコードをコピーする (オンライン変更) ために、インスタンスをコピーします。
+END_VAR
+VAR
+	nTaskIdx: DINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// サイクルタイムを取得（10ms）
+fCycleTime := 0.01;
+
+// 初期化完了
+bInitialized := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Generate" Id="{083c59b3-ec58-401c-88ed-cb48928312c5}">
+      <Declaration><![CDATA[/// <summary>
+/// 信号を生成する
+/// </summary>
+METHOD Generate : BOOL
+VAR_INPUT
+	/// 周波数 [Hz]
+	fFrequency : LREAL;
+	/// 振幅
+	fAmplitude : LREAL;
+	/// 格納データ
+	refData : REFERENCE TO ARRAY[1..10] OF LREAL;
+END_VAR
+VAR
+	i : INT;
+	nTaskIdx : DINT;
+	fTimeInst : LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// データ格納先の参照が有効（nullでないか）確認
+IF NOT __ISVALIDREF(refData) THEN
+	Generate := FALSE;
+	RETURN;
+END_IF
+
+FOR i := 1 TO 10 DO
+    fTimeInst := fPhase + (fCycleTime * (i - 1) / 10.0);
+    refData[i] := fAmplitude * SIN(2.0 * 3.14159265358979 * fFrequency * fTimeInst);
+END_FOR
+
+fPhase := fPhase + fCycleTime;
+
+// 位相リセット
+IF fPhase > 1000.0 THEN fPhase := fPhase - 1000.0; END_IF
+
+Generate := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

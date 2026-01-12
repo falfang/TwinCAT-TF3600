@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Task Name="MeasurementTask" Id="{b129aefb-57fe-4dc8-b2ea-963d93c6f2c8}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>10000</CycleTime>
+    <Priority>1</Priority>
+    <PouCall>
+      <Name>PRG_Measurement</Name>
+    </PouCall>
+    <TaskFBGuid>{00451640-0503-43fe-8842-7480ab011952}</TaskFBGuid>
+    <Fb_init>{9549c797-ac3b-493d-ad0f-7127d49d7a9b}</Fb_init>
+    <Fb_exit>{02a6130f-ede0-4afc-8b46-b77eeefb1924}</Fb_exit>
+    <CycleUpdate>{ba540082-30bd-4b5b-8a01-14e01fe08437}</CycleUpdate>
+    <PostCycleUpdate>{968d05aa-dbfd-4d94-aeba-b2492b91ce52}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>
