@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="PRG_ConditionMonitoring" Id="{03c9237d-4c16-46ed-9bf2-9b4505a2d45f}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_ConditionMonitoring
+VAR CONSTANT
+	cInitSpectrum : ST_CM_MagnitudeSpectrum_InitPars := (
+									nFFT_Length := GVL_Constants.cFFTLength, 
+                                    nWindowLength := GVL_Constants.cWindowLength, 
+                                    bTransformToDecibel:= FALSE, 
+                                    eWindowType := eCM_HannWindow, 
+                                    eScalingType := eCM_PeakAmplitude);
+END_VAR
+VAR
+	/// スペクトラム計算器
+	fbSpectrum : FB_CMA_MagnitudeSpectrum := (stInitPars := cInitSpectrum, nOwnID := E_CMA_ID.eFFT_ID, aDestIDs := [E_CMA_ID.eSink_ID]);
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// 計算実施
+fbSpectrum.Call();
+
+// Note : 本プログラムの計算周期は下記とすること
+// sample-rate  = oversampling_factor / sampling_task_cycle_time;
+// 				= 10 / 0.01 = 1000 [ms] ?]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

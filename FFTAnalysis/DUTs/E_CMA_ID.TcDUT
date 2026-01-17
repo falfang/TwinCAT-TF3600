@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_CMA_ID" Id="{c90b485d-146a-430d-bd10-0d8400fa5672}">
+    <Declaration><![CDATA[/// <summary>
+/// ConditionMonitoring-ID一覧
+/// </summary>
+{attribute 'qualified_only'}
+TYPE E_CMA_ID :
+(
+	eSource_ID := 1,
+	eFFT_ID,
+	eSink_ID
+) UDINT;
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

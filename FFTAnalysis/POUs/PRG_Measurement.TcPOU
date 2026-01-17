@@ -5,6 +5,12 @@
 /// 計測プログラム
 /// </summary>
 PROGRAM PRG_Measurement
+VAR CONSTANT
+	cInitSource : ST_MA_MultiArray_InitPars := ( 
+		eTypeCode := eMA_TypeCode_LREAL,
+		nDims := 1,
+		aDimSizes := [GVL_Constants.cBufferLength]);
+END_VAR
 VAR
 	/// サンプルデータ #1
 	sampleData1 : ARRAY[1..10] OF LREAL;
@@ -20,20 +26,127 @@ VAR
 	/// Sin波信号生成器 #3
 	fbSineWaveGen3 : FB_SineWaveGenerator;
 	
+	fbSource1 : FB_CMA_Source := ( stInitPars := cInitSource, nOwnID := E_CMA_ID.eSource_ID, aDestIDs := [E_CMA_ID.eFFT_ID]);
+	fbSink1 : FB_CMA_Sink := (nOwnID := E_CMA_ID.eSink_ID);
+	aSpectrumResult : ARRAY[1..GVL_Constants.cFFTResult] OF LREAL;
+	
 	idx : UDINT;
+	
+	/// 計算完了フラグ
+	bCalculated : BOOL;
+	
+	/// チャンネルIndex
+	nChannel : UDINT;
+	
+	// FixMe: 隣接するインデックスが2nd, 3rdとなっている。ピーク値のみを考える必要がある。
+	fPrimaryAmp : LREAL;		// 一次周波数 振幅
+	fPrimaryIndex : UDINT;		// 一次周波数 インデックス
+	fPrimaryFrequency : LREAL;	// 一次周波数 [Hz]
+	fSecondaryAmp : LREAL;			// 二次周波数 振幅	
+	fSecondaryIndex : LREAL;		// 二次周波数 インデックス
+	fSecondaryFrequency : LREAL;	// 二次周波数 [Hz]
+	fTertiaryAmp : LREAL;		// 三次周波数 振幅
+	fTertiaryIndex : LREAL;		// 三次周波数 インデックス
+	fTertiaryFrequency : LREAL;	// 三次周波数 [Hz]
+	
+	
+	fSampleTaskCycleTime: LREAL := 1; 	// ms
+	fSampleRate			: LREAL; 		// Hz  ( sample rate = oversampling factor / cycle time )
+	fResolution			: LREAL; 		// Hz/Idx
+	fMaxFrequency: INT;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[// サンプルデータを計測する
-fbSineWaveGen1.Generate(fFrequency := 0.5, fAmplitude := 5.0, refData := sampleData1);
-fbSineWaveGen2.Generate(fFrequency := 10.0, fAmplitude := 3.0, refData := sampleData2);
-fbSineWaveGen3.Generate(fFrequency := 100.0, fAmplitude := 2.0, refData := sampleData3);
+fbSineWaveGen1.Generate(fFrequency := 10.0, fAmplitude := 5.0, refData := sampleData1);
+fbSineWaveGen2.Generate(fFrequency := 100.0, fAmplitude := 3.0, refData := sampleData2);
+fbSineWaveGen3.Generate(fFrequency := 300.0, fAmplitude := 2.0, refData := sampleData3);
+
 
 
 // 信号を合成する
+idx := 1;
 FOR idx := 1 TO 10 DO
 	GVL.MeasuredData[idx] := sampleData1[idx] + sampleData2[idx] + sampleData3[idx];
-END_FOR]]></ST>
+END_FOR
+
+// 合成信号をFB_CMA_Sourceに格納する
+fbSource1.Input1DStd(
+	pDataIn := ADR(GVL.MeasuredData),
+	nDataInSize := SIZEOF(GVL.MeasuredData),
+	eElementType := eMA_TypeCode_LREAL,
+	nOptionPars := cCMA_Option_MarkInterruption
+);
+
+
+// 計算結果をfbSinkに格納する
+fbSink1.Output1DStd(
+	pDataOut := ADR(aSpectrumResult),
+	nDataOutSize := SIZEOF(aSpectrumResult),
+	eElementType := eMA_TypeCode_LREAL,
+	nOptionPars := 0,
+	bNewResult => bCalculated
+);
+
+// 結果が更新されていない場合は終了
+(*
+IF NOT bCalculated THEN
+	RETURN;
+END_IF
+*)
+
+// 不正な値が計算されていたら終了
+(*
+IF LrealIsNaN(aSpectrumResult[1]) THEN
+	RETURN;
+END_IF
+*)
+
+// 初期値
+fPrimaryAmp := 0.0;
+fSecondaryAmp := 0.0;
+fTertiaryAmp := 0.0;
+
+// データをソートする
+nChannel := 1;
+FOR nChannel := 1 TO GVL_Constants.cFFTResult DO
+	
+	// 当該データが1stより大きい場合
+	IF aSpectrumResult[nChannel] > fPrimaryAmp THEN
+		// 2nd -> 3rd
+		fTertiaryAmp := fSecondaryAmp;
+		fTertiaryIndex := fSecondaryIndex;
+		// 1st -> 2nd
+		fSecondaryAmp := fPrimaryAmp;
+		fSecondaryIndex := fPrimaryIndex;
+		// Append new 1st
+		fPrimaryAmp := aSpectrumResult[nChannel];
+		fPrimaryIndex := nChannel;
+	
+	// 当該データが2ndよりも大きい場合
+	ELSIF aSpectrumResult[nChannel] > fSecondaryAmp THEN
+		// 2nd -> 3rd
+		fTertiaryAmp := fSecondaryAmp;
+		fTertiaryIndex := fSecondaryIndex;
+		// Append new 2nd
+		fSecondaryAmp := aSpectrumResult[nChannel];
+		fSecondaryIndex := nChannel;
+		
+	// 当該データが3rdよりも大きい場合
+	ELSIF aSpectrumResult[nChannel] > fTertiaryAmp THEN
+		// Append new 3rd
+		fTertiaryAmp := aSpectrumResult[nChannel];
+		fTertiaryIndex := nChannel;
+	END_IF
+END_FOR
+
+// Calculate frequency for max amplitude [ frequency = index * (sample rate / FFT length) ]
+fSampleRate := GVL_Constants.cOversamples * (1000.0 / fSampleTaskCycleTime);
+fResolution := fSampleRate / GVL_Constants.cFFTLength;
+
+fPrimaryFrequency := (fPrimaryIndex-1) * fResolution;
+fSecondaryFrequency := (fSecondaryIndex-1) * fResolution;
+fTertiaryFrequency := (fTertiaryIndex-1) * fResolution;]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

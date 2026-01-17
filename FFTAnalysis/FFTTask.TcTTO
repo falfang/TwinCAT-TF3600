@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Task Name="FFTTask" Id="{db3f5499-d2b1-41a4-b819-72743de8266b}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>5000</CycleTime>
+    <Priority>2</Priority>
+    <PouCall>
+      <Name>PRG_ConditionMonitoring</Name>
+    </PouCall>
+    <TaskFBGuid>{92f1625e-1a36-4fb8-bae0-9748cc6c1833}</TaskFBGuid>
+    <Fb_init>{653c9207-e2bd-4221-9a46-f862b65b21b5}</Fb_init>
+    <Fb_exit>{f26a309d-6e5d-42f3-a681-5e95c56045f4}</Fb_exit>
+    <CycleUpdate>{2334923a-a0b4-44f5-b005-77de9874cf74}</CycleUpdate>
+    <PostCycleUpdate>{42d7804b-3813-4839-80f2-1b25e7db6e0f}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

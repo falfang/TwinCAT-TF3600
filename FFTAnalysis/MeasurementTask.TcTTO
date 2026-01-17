@@ -2,7 +2,7 @@
 <TcPlcObject Version="1.1.0.1">
   <Task Name="MeasurementTask" Id="{b129aefb-57fe-4dc8-b2ea-963d93c6f2c8}">
     <!--CycleTime in micro seconds.-->
-    <CycleTime>10000</CycleTime>
+    <CycleTime>11000</CycleTime>
     <Priority>1</Priority>
     <PouCall>
       <Name>PRG_Measurement</Name>

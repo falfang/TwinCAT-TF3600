@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_Constants" Id="{41fbab77-f13e-4871-a7e9-88d1b0300cc6}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+	/// オーバーサンプリング数
+	cOverSamples : UDINT := 10;
+	
+	/// バッファ長
+	cBufferLength : UDINT := 1600;
+	
+	/// 窓長さ
+	cWindowLength : UDINT := 3200;
+	
+	/// FFT計算結果長
+	cFFTResult : UDINT := 2049;
+	
+	/// FFT長
+	cFFTLength : UDINT := 4096;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

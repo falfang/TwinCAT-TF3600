@@ -18,7 +18,17 @@
     <LibraryReferences>{bc4eb6f3-dfbd-4379-9af9-d16721b152b1}</LibraryReferences>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DUTs\E_CMA_ID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FFTTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="GVLs\GVL.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="GVLs\GVL_Constants.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>
@@ -26,6 +36,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\FB_SineWaveGenerator.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\PRG_ConditionMonitoring.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\PRG_Measurement.TcPOU">
@@ -47,10 +60,26 @@
       <DefaultResolution>Tc2_System, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_System</Namespace>
     </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Utilities">
+      <DefaultResolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Utilities</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_CM">
+      <DefaultResolution>Tc3_CM, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_CM</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_CM_Base">
+      <DefaultResolution>Tc3_CM_Base, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_CM_Base</Namespace>
+    </PlaceholderReference>
     <PlaceholderReference Include="Tc3_Module">
       <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_Module</Namespace>
       <SystemLibrary>true</SystemLibrary>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_MultiArray">
+      <DefaultResolution>Tc3_MultiArray, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_MultiArray</Namespace>
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
